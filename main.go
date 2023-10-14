@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -16,10 +18,26 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func snippetView(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Display a specific snippet..."))
+	//extract id parameter from query string & try to convert to int via atoi, if it can't be converted or is less than 1 return 404
+	id, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil || id < 1 {
+		http.NotFound(w, r)
+		return
+	}
+	// use fmt.fprint to write the ID with response
+	fmt.Fprint(w, "Display a specific snippet with ID %d...", id)
 }
 
 func snippetCreate(w http.ResponseWriter, r *http.Request) {
+	// check request method to ensure post method
+	if r.Method != http.MethodPost {
+		//if not post return 405 error on response
+		// note: only possible to call w.WriteHeader() once per response, and after the status code has been written it can’t be changed
+		//If you don’t call w.WriteHeader() explicitly, then the first call to w.Write() will automaticallysenda200 OKstatuscodetotheuser
+		w.Header().Set("Allow", http.MethodPost) // add methods allowed in response
+		http.Error(w, "Method Not Allowed", 405)
+		return
+	}
 	w.Write([]byte("Create a new snippet..."))
 }
 
