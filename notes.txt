@@ -1,0 +1,60 @@
+handlers = Controller in MVC.  execute application logic
+router / servemux
+    (servemux in Go) = mapping between URL
+    Usually you have one servemux for your application containing all your route
+    Go’s servemux treats the URL pattern "/" like a catch-all. Go to anypath that does/doesn't exist like http://localhost:4000/foo and you’ll receive / response
+        what if you don’t want the "/" pattern to act like a catch-all?
+            if r.URL.Path != "/" {
+                http.NotFound(w, r)
+                return
+                }
+
+
+     longer URL patterns always take precedence over shorter ones. So, if a servemux contains multiple patterns which match a request, it will always dispatch the request to the handler corresponding to the longest pattern.
+
+    Request URL paths are automatically sanitized. If the request path contains any . or .. elements or repeated slashes, the user will automatically be redirected to an equivalent clean URL
+
+    If a subtree path has been registered and a request is received for that subtree path without a trailing slash, then the user will automatically be sent a
+    301 Permanent Redirect to the subtree path with the slash added. For example, if you have registered the subtree path /foo/, then any request to /foo will be redirected to /foo/
+
+    servemux supports two different types of URL patterns: 
+        fixed paths - Fixed paths don’t end with a trailing slash (/snippet/view)
+        subtree paths - whereas subtree paths do end with a trailing slash.
+
+
+
+web server
+    Go is that you can establish a web server and listen for incoming requests as part of your application itself. You don’t need an external third-party server like Nginx, Apache or Caddy.
+    crtl+c to kill server
+
+
+
+    http.Error() shortcut. This is a lightweight helper function which takes a given message and status code, then calls the w.WriteHeader() and w.Write() methods behind the scenes for you.
+
+
+    http constants for http methods/status codes: https://pkg.go.dev/net/http#pkg-constants    
+
+
+Go auto sets 3 response headers for you:
+    Date - 
+    Content-Length - 
+    Content-Type
+        - will sniff response to determine type using: http.DetectContentType()
+        - can't tell difference betwen json / plain text
+        - can manually set via:  w.Header().Set("Content-Type", "application/json")
+
+
+project structure
+    seperates go/non-go asserts
+    scales well
+
+    cmd         - application specific code
+        web
+    
+    internal    
+        - non application specific code - re-useable code like validation helpers
+        - can only be imported by anything under parent snippetbox directory / cannot be imported outside of this project
+
+    ui
+        html    - htmk templates
+        static  - CSS/images

@@ -15,14 +15,20 @@ func home(w http.ResponseWriter, r *http.Request) {
 	}
 	//read template file and if error return 500 error to user.
 	//note - file path that you pass to the template.ParseFiles() function must either be relative to your current working directory, or an absolute path
-	ts, err := template.ParseFiles("./ui/html/pages/home.tmpl")
+	files := []string{
+		"./ui/html/base.tmpl",
+		"./ui/html/pages/home.tmpl",
+		"./ui/html/partials/nav.tmpl",
+	}
+
+	ts, err := template.ParseFiles(files...)
 	if err != nil {
 		log.Print(err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError) // 500
 		return
 	}
 	//use Execute() on template to set to write content as response body, last parameter is dynamic data to pass to template.  nil for now
-	err = ts.Execute(w, nil)
+	err = ts.ExecuteTemplate(w, "base", nil)
 	if err != nil {
 		log.Print(err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError) // 500
