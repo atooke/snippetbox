@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"log"
+	"log/slog"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -13,6 +14,9 @@ func main() {
 
 	//parses command line flag into addr, call before using addr otherwise default of 4000 will always be used.
 	flag.Parse()
+
+	//setup custom logger
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 
 	// use the http.hewservemux to create a new router
 	// then register home func as the handler for the / URL pattern
@@ -31,11 +35,14 @@ func main() {
 	mux.HandleFunc("/snippet/view", snippetView)
 	mux.HandleFunc("/snippet/create", snippetCreate)
 
-	// pri9nt a log message to say server is starting
-	log.Printf("starting server on %s\n", *addr)
+	// Use Info method to log the starting server message at info severity
+	//along with the listen address as an atrtibute
+	logger.Info("starting server", slog.String("addr", *addr))
 
 	//user http.ListenAndServe() to start the web server.  host:port
 	err := http.ListenAndServe(*addr, mux)
-	log.Fatal(err)
+	// no structured logging eqv of Fatal so use error & then exit
+	logger.Error(err.Error())
+	os.Exit(1)
 
 }
