@@ -7,6 +7,10 @@ import (
 	"os"
 )
 
+type application struct {
+	logger *slog.Logger
+}
+
 func main() {
 
 	//define new command line arg, default value of :4000
@@ -17,6 +21,10 @@ func main() {
 
 	//setup custom logger
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+
+	// Initialize a new instance of our application struct, containing the // dependencies (for now, just the structured logger).
+	app := &application{
+		logger: logger}
 
 	// use the http.hewservemux to create a new router
 	// then register home func as the handler for the / URL pattern
@@ -31,9 +39,9 @@ func main() {
 	//URL paths that start with "/static/".  For matching paths, we strip the "/static" prefix before the request reaches the file server
 	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
 
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/snippet/view", snippetView)
-	mux.HandleFunc("/snippet/create", snippetCreate)
+	mux.HandleFunc("/", app.home)
+	mux.HandleFunc("/snippet/view", app.snippetView)
+	mux.HandleFunc("/snippet/create", app.snippetCreate)
 
 	// Use Info method to log the starting server message at info severity
 	//along with the listen address as an atrtibute
