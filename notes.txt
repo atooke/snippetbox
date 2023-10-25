@@ -58,3 +58,23 @@ project structure
     ui
         html    - htmk templates
         static  - CSS/images
+
+
+mysql notes:
+
+    on macos:
+        brew install mysql
+        brew services start mysql
+
+    Using:
+        mysql -D snippetbox -u web -p <password here>;
+
+Install Go packages for app:
+    go get github.com/go-sql-driver/mysql@v1
+
+    go mod verify
+    go mod download -- download dependencies for project you've cloned
+    
+    go get github.com/foo/bar@none -- remove pacakge with @none
+    or
+    go mod tidy - remove unused pacakges from go.mod/.sum
